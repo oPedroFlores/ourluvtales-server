@@ -1,28 +1,54 @@
 // user/services/UserService.js
 const User = require('./DataModel');
+const sequelize = require('../../db');
+const CoupleController = require('../couple/Controller');
+const CoupleMemberController = require('../couple_member/Controller');
 require('dotenv').config();
 
-const createUser = async (userData) => {
-  const { email, password, ...otherData } = userData;
+const createUser = async (userData, isInvite = false, req) => {
+  const transaction = await sequelize.transaction();
+  try {
+    const { email, password, ...otherData } = userData;
 
-  // Verifica se o email já está registrado
-  const existingUser = await User.findOne({ where: { email } });
-  if (existingUser) {
-    throw new Error('Email já está em uso.');
+    const existingUser = await User.findOne({ where: { email }, transaction });
+    if (existingUser) {
+      throw new Error('Email já está em uso.');
+    }
+
+    const user = await User.create(
+      {
+        email,
+        password,
+        ...otherData,
+      },
+      { transaction },
+    );
+
+    if (!isInvite) {
+      const couple = await CoupleController.createCouple(user, transaction);
+    } else {
+      const coupleId = req.invite.coupleId;
+      console.log('CoupleId: ', coupleId);
+      const coupleNewMember = await CoupleMemberController.addCoupleMember(
+        coupleId,
+        user.id,
+        transaction,
+      );
+      console.log('CoupleNewMember: ', coupleNewMember);
+      //TODO Atualizar nome do casal
+    }
+
+    await transaction.commit();
+
+    const userWithoutPassword = user.toJSON();
+    delete userWithoutPassword.password;
+
+    return userWithoutPassword;
+  } catch (error) {
+    await transaction.rollback();
+    console.log('Error: ', error);
+    throw error;
   }
-
-  // Cria o usuário (a senha será hashada pelos hooks no modelo)
-  const user = await User.create({
-    email,
-    password,
-    ...otherData,
-  });
-
-  // Remove a senha do objeto retornado
-  const userWithoutPassword = user.toJSON();
-  delete userWithoutPassword.password;
-
-  return userWithoutPassword;
 };
 
 const authenticateUser = async (email, password) => {

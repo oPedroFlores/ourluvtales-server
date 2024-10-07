@@ -1,13 +1,15 @@
 // models/Couple.js
-const { Sequelize, DataTypes } = require('sequelize');
-const database = require('../../db');
 
-const Couple = database.define(
-  'Couple',
+const { DataTypes, Model } = require('sequelize');
+const sequelize = require('../../db'); // Ajuste o caminho conforme necessário
+
+class Couple extends Model {}
+
+Couple.init(
   {
     id: {
       type: DataTypes.UUID,
-      defaultValue: Sequelize.UUIDV4,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       primaryKey: true,
     },
@@ -18,9 +20,21 @@ const Couple = database.define(
     },
   },
   {
+    sequelize,
+    modelName: 'Couple',
     tableName: 'couples',
     timestamps: true,
   },
 );
+
+// Definindo associações após todos os modelos serem importados
+Couple.associate = (models) => {
+  Couple.belongsToMany(models.User, {
+    through: models.CoupleMember,
+    foreignKey: 'coupleId',
+    otherKey: 'userId',
+    as: 'Members',
+  });
+};
 
 module.exports = Couple;

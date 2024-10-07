@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
 const userRoutes = require('./user/Routes');
+const inviteRoutes = require('./couple_invite/Route');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Rotas
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/invite', inviteRoutes);
 
 app.get('/', (req, res) => {
   res.send('Api OurLuvTales ON!');

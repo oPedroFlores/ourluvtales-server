@@ -10,6 +10,7 @@ const TripPhoto = require('./trip_photo/DataModel');
 const TimelineEvent = require('./timeline/DataModel');
 const Mood = require('./mood/DataModel');
 const Notification = require('./notification/DataModel');
+const CoupleInvitation = require('./couple_invite/DataModel');
 
 // Relação entre User e Couple através de CoupleMember
 User.belongsToMany(Couple, {
