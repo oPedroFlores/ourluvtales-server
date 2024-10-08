@@ -29,3 +29,14 @@ module.exports.addCoupleMember = async (coupleId, userId, transaction) => {
     throw error;
   }
 };
+
+module.exports.getCoupleIdByUserId = async (userId) => {
+  try {
+    const coupleMember = await CoupleMember.findOne({
+      where: { userId },
+    });
+    return coupleMember.coupleId;
+  } catch (error) {
+    throw error;
+  }
+};

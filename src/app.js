@@ -7,6 +7,10 @@ const rateLimit = require('express-rate-limit');
 
 const userRoutes = require('./user/Routes');
 const inviteRoutes = require('./couple_invite/Route');
+const couplePhotos = require('./photo/Route');
+
+// Testes
+const testRoutes = require('./test/Route');
 
 const app = express();
 
@@ -30,7 +34,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Rotas
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/invite', inviteRoutes);
-
+app.use('/api/v1/test', testRoutes);
+app.use('/api/v1/photos', couplePhotos);
 app.get('/', (req, res) => {
   res.send('Api OurLuvTales ON!');
 });

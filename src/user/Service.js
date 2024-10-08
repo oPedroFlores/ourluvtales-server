@@ -29,13 +29,17 @@ const createUser = async (userData, isInvite = false, req) => {
     } else {
       const coupleId = req.invite.coupleId;
       console.log('CoupleId: ', coupleId);
-      const coupleNewMember = await CoupleMemberController.addCoupleMember(
+      await CoupleMemberController.addCoupleMember(
         coupleId,
         user.id,
         transaction,
       );
-      console.log('CoupleNewMember: ', coupleNewMember);
       //TODO Atualizar nome do casal
+      await CoupleController.addUserNameInCoupleName(
+        coupleId,
+        user.firstName,
+        transaction,
+      );
     }
 
     await transaction.commit();
@@ -121,6 +125,14 @@ const checkEmail = async (email) => {
   return !!user;
 };
 
+const getUserNameById = async (userId) => {
+  const user = await User.findByPk(userId);
+  if (!user) {
+    throw new Error('Usário não encontrado.');
+  }
+  return { firstName: user.firstName, lastName: user.lastName };
+};
+
 module.exports = {
   createUser,
   authenticateUser,
@@ -128,4 +140,5 @@ module.exports = {
   updateUser,
   deleteUser,
   checkEmail,
+  getUserNameById,
 };

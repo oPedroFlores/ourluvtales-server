@@ -1,0 +1,10 @@
+{
+  "defaultSize": {
+    "width": 1024,
+    "height": 1024
+  },
+  "bigSize": {
+    "width": 2048,
+    "height": 2048
+  }
+}
