@@ -3,6 +3,7 @@ const User = require('./DataModel');
 const sequelize = require('../../db');
 const CoupleController = require('../couple/Controller');
 const CoupleMemberController = require('../couple_member/Controller');
+const { handleImageUpload } = require('../S3');
 require('dotenv').config();
 
 const createUser = async (userData, isInvite = false, req) => {
@@ -15,17 +16,27 @@ const createUser = async (userData, isInvite = false, req) => {
       throw new Error('Email já está em uso.');
     }
 
+    // Fazer upload da foto caso tenha sido enviada
+    if (req.file) {
+      const newPhotoS3 = await handleImageUpload(req.file, null);
+    }
+
     const user = await User.create(
       {
         email,
         password,
+        profilePicture: newPhotoS3,
         ...otherData,
       },
       { transaction },
     );
 
     if (!isInvite) {
-      const couple = await CoupleController.createCouple(user, transaction);
+      const couple = await CoupleController.createCouple(
+        user,
+        transaction,
+        req.body.coupleBirthDate,
+      );
     } else {
       const coupleId = req.invite.coupleId;
       console.log('CoupleId: ', coupleId);

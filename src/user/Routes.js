@@ -7,9 +7,19 @@ const { verifyToken } = require('./middlewares/authMiddleware');
 const authorizeRoles = require('./middlewares/authorizeRoles'); // Implementaremos este middleware mais tarde
 const authorizeSelfOrAdmin = require('./middlewares/authorizeSelfOrAdmin');
 const validateUpdateUser = require('./middlewares/valideUpdateUser');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+const photoMiddleware = require('../photo/Middlewares/Middleware');
 
 // Rota de registro de usuário
-router.post('/', validateRegister, UserController.register);
+router.post(
+  '/',
+  validateRegister,
+  upload.single('image'),
+  photoMiddleware.validateImageIfSended,
+  UserController.register,
+);
 
 // Rota de login de usuário
 router.post('/login', (req, res) => {
@@ -37,6 +47,8 @@ router.put(
   verifyToken,
   authorizeSelfOrAdmin,
   validateUpdateUser,
+  upload.single('image'),
+  photoMiddleware.validateImageIfSended,
   UserController.updateUser,
 );
 

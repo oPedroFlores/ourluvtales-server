@@ -58,8 +58,8 @@ const handleImageUpload = async (file, existingImage) => {
 
     const buffer = await sharp(file.buffer)
       .resize({
-        height: imageConfig.defaultSize.height,
-        width: imageConfig.defaultSize.width,
+        height: imageConfig.defaultSize.height || 1024,
+        width: imageConfig.defaultSize.width || 1024,
         fit: 'cover',
       })
       .toBuffer();

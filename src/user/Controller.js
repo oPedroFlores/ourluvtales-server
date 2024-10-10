@@ -1,9 +1,10 @@
 // user/controllers/UserController.js
 const UserService = require('./Service');
+const { handleImageUpload } = require('../S3');
 
 module.exports.register = async (req, res) => {
   try {
-    const user = await UserService.createUser(req.body);
+    const user = await UserService.createUser(req.body, false, req);
     res.status(201).json({ user, success: true });
   } catch (error) {
     res.status(400).json({ error: error.message, success: false });
@@ -34,6 +35,13 @@ module.exports.getUserById = async (req, res) => {
 module.exports.updateUser = async (req, res) => {
   try {
     const user = req.user;
+
+    // Atualizar foto caso tenha req.file
+    if (req.file) {
+      const newPhotoS3 = await handleImageUpload(req.file, user.profilePicture);
+      req.body.profilePicture = newPhotoS3;
+    }
+
     const updatedUser = await UserService.updateUser(
       req.params.id,
       req.body,

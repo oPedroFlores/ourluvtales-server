@@ -30,6 +30,11 @@ const registerSchema = Joi.object({
     'any.required': 'Data de nascimento é obrigatória.',
   }),
 
+  coupleBirthDate: Joi.date().iso().messages({
+    'date.base': 'Inicio do relacionamento deve ser uma data válida.',
+    'date.format': 'Inicio do relacionamento deve estar no formato ISO.',
+  }),
+
   profilePicture: Joi.string().uri().optional().messages({
     'string.uri': 'URL da foto de perfil inválida.',
   }),

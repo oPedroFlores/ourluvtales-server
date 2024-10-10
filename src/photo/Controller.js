@@ -3,8 +3,6 @@ const { handleImageUpload, deleteImageS3, getImageS3 } = require('../S3');
 const Photo = require('./DataModel');
 const User = require('../user/DataModel');
 const exifParser = require('exif-parser'); // Importando o exif-parser
-const { getUserNameById } = require('../user/Service');
-
 module.exports.uploadPhoto = async (req, res) => {
   try {
     //! PEGAR O COUPLE ID
@@ -123,6 +121,37 @@ module.exports.getPhotosByPage = async (req, res) => {
     return res
       .status(200)
       .json({ photos: PhotosData, amount: count, page, success: true });
+  } catch (error) {
+    return res.status(500).json({ error: error.message, success: false });
+  }
+};
+
+module.exports.updatePhoto = async (req, res) => {
+  try {
+    const id = req.params.id;
+    // Atualizar a foto pela nova com a mesma key
+    let newPhotoS3 = null;
+    if (req.file) {
+      newPhotoS3 = await handleImageUpload(req.file, req.photo.photoUrl);
+      req.body.photoUrl = newPhotoS3;
+    }
+    const updatedPhoto = await Photo.update(req.body, {
+      where: { id },
+    });
+    return res.status(200).json({ updatedPhoto, success: true });
+  } catch (error) {
+    return res.status(500).json({ error: error.message, success: false });
+  }
+};
+
+module.exports.deletePhoto = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const photoKey = req.photo.photoUrl;
+    await deleteImageS3(photoKey);
+    const photo = await Photo.findOne({ where: { id } });
+    await photo.destroy();
+    return res.status(200).json({ success: true });
   } catch (error) {
     return res.status(500).json({ error: error.message, success: false });
   }

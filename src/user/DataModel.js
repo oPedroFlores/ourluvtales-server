@@ -111,4 +111,13 @@ User.init(
   },
 );
 
+User.associate = (models) => {
+  User.belongsToMany(models.Couple, {
+    through: models.CoupleMember,
+    foreignKey: 'userId',
+    otherKey: 'coupleId',
+    as: 'Couples',
+  });
+};
+
 module.exports = User;

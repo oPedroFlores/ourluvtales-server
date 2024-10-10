@@ -20,4 +20,23 @@ router.post(
 // Pegar fotos por paginação
 router.get('/', authMiddleware.verifyToken, photoController.getPhotosByPage);
 
+//* Atualizar dados da foto
+router.put(
+  '/:id',
+  authMiddleware.verifyToken,
+  upload.single('image'),
+  photoMiddleware.validateImageIfSended,
+  validatePhotoUpload,
+  photoMiddleware.doestPhotoIdBelongToCouple,
+  photoController.updatePhoto,
+);
+
+//* Deletar foto permanentemente
+router.delete(
+  '/:id',
+  authMiddleware.verifyToken,
+  photoMiddleware.doestPhotoIdBelongToCouple,
+  photoController.deletePhoto,
+);
+
 module.exports = router;

@@ -1,7 +1,7 @@
 // models/Couple.js
 
 const { DataTypes, Model } = require('sequelize');
-const sequelize = require('../../db'); // Ajuste o caminho conforme necessário
+const sequelize = require('../../db');
 
 class Couple extends Model {}
 
@@ -17,6 +17,11 @@ Couple.init(
       type: DataTypes.STRING(200),
       allowNull: false,
       field: 'couple_name',
+    },
+    dateOfBirth: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+      field: 'date_of_birth',
     },
   },
   {
